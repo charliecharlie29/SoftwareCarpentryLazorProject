@@ -1,0 +1,33 @@
+# This is what the solution to mad_1.bff looks like
+
+GRID START
+o   o   C   o
+o   o   o   A
+A   o   o   o
+o   o   o   o
+GRID STOP
+
+# Here we specify that we have 5 reflect blocks
+A 2
+C 1
+
+# Now we specify that we have two lazers
+#    x, y, vx, vy
+# NOTE! because 0, 0 is the top left, our axis
+# are as follows:
+#
+#      __________\ +x
+#      |         /
+#      |
+#      |
+#      |
+#     \|/ +y
+#      
+L 2 7 1 -1
+
+
+# Here we have the points that we need the lazers to intersect
+P 3 0
+P 4 3
+P 2 5
+P 4 7

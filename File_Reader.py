@@ -105,6 +105,6 @@ def lazor_board_reader(filename):
 
 
 if __name__ == '__main__':
-    a = lazor_board_reader('numbered_6.bff')
+    a = lazor_board_reader('mad_1_solution_board.bff')
     grid = a[0]
     
