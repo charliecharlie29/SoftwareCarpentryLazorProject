@@ -66,6 +66,7 @@ def lazor_board_reader(filename):
                 if important_text[i + j] == "GRID STOP":
                     break
                 file_grid.append(important_text[i + j])
+                important_text[i + j] = '@'
             break
     for k in range(len(file_grid)):
         file_grid[k] = list(file_grid[k].strip().split())
@@ -101,7 +102,6 @@ def lazor_board_reader(filename):
             intersects.append((int(important_text[l][1]), int(important_text[l][2])))
 
     return grid, blocks_a_b_c, lazers, intersects
-
 
 
 def get_colors():
@@ -214,9 +214,10 @@ def lazor_solver(filename):
     '''
     if ".bff" in filename:
         filename = filename.split(".bff")[0]
-
     a = lazor_board_reader(filename=filename + '.bff')
     save_grid(a[0], name="%s_solution.png" % filename)
 
 if __name__ == '__main__':
-    a = lazor_solver('numbered_6.bff')
+    a = lazor_solver('mad_1.bff')
+    b = lazor_solver('numbered_6')
+
