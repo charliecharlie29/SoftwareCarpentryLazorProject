@@ -60,16 +60,18 @@ def lazor_board_reader(filename):
     # Select out the section of the file that represents what
     # the grid will look like, and then turn that into an array
     file_grid = list()
-    for i in range(0, len(important_text)):
-        if important_text[i] == "GRID START":
-            for j in range(1, len(important_text)-i):
-                if important_text[i + j] == "GRID STOP":
-                    break
-                file_grid.append(important_text[i + j])
-                important_text[i + j] = '@'
-            break
+    if 'GRID STOP' in important_text:
+        for i in range(0, len(important_text)):
+            if important_text[i] == "GRID START":
+                for j in range(1, len(important_text)-i):
+                    if important_text[i + j] == "GRID STOP":
+                        break
+                    file_grid.append(important_text[i + j])
+                    important_text[i + j] = '@'
+                break
     for k in range(len(file_grid)):
         file_grid[k] = list(file_grid[k].strip().split())
+
     
     # Generate the array version of the grid and write in 
     # specifications from the .bff file
