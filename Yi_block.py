@@ -62,7 +62,7 @@ class Block:
         # block is at the top or bottom of laser position if x is an odd number
         else:
             if (self.type == 'a'):
-                new_dir = [(dir[0] + -1, dir[1])]
+                new_dir = [(dir[0] * -1, dir[1])]
             elif (self.type == 'b'):
                 new_dir = []
             else:
@@ -99,6 +99,7 @@ def update_laser(board, pos, dir):
         a list that hold new directions laser will be going
     '''
     x, y = pos[0], pos[1]
+    new_dir = []
 
     # check top and bottom of laser position if x is an odd number
     if (x % 2 == 1):
@@ -112,6 +113,8 @@ def update_laser(board, pos, dir):
         if not (board[x + dir[0]][y] == 'o') or (board[x + dir[0]][y] == 'x'):
             block = Block((x + dir[0], y), board[x + dir[0]][y])
             new_dir = block.laser(pos, dir)
+        else:
+            new_dir = [dir]
 
     return new_dir
 

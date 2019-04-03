@@ -219,4 +219,3 @@ def lazor_solver(filename):
 
 if __name__ == '__main__':
     a = lazor_solver('mad_1.bff')
-    b = lazor_solver('numbered_6')
