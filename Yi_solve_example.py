@@ -2,6 +2,11 @@ from Lazor_Solver import lazor_board_reader
 from Yi_block import Block
 from Yi_block import update_laser
 
+'''
+This script takes a board with blocks assigned and calculates the pathway of
+lasers, and determine whether the solution is correct.
+'''
+
 if __name__ == '__main__':
 
     # Obtain the input info from lazor_board_reader function
@@ -19,6 +24,22 @@ if __name__ == '__main__':
     board[1][5] = 'A'
 
     def pos_chk(board, pos):
+    '''
+    This function checks whether a given laser position is at the boundary of
+    the board.
+
+    **Parameters**
+        board: *list, list, string*
+            contains list of x coordinates, in which list is a list of y
+            coordinates containing a string representing the type of block on
+            the board
+        pos: *tuple*
+            the current (x,y) position of the laser
+
+    **Return**
+        *boolean*
+            True if not on boundary and False if on boundary
+    '''
         len_x, len_y = len(board), len(board[0])
         if (pos[0] == 0 or pos[0] == len_x - 1 or pos[1] == 0 or pos[1] == len_y - 1):
             return False
@@ -27,10 +48,11 @@ if __name__ == '__main__':
     # solve for the laser path
     success = False
 
+    # Keep iterating the laser until success or all lasers out of boundary or
+    # absorbed
     while not success:
-
+        # A list that holds targets not hit by lasers yet
         target_remain = targetPos[:]
-        i = 0
         for i in range (len(laserList)):
             # Get current position of this laser if the last position in this
             # laser list is not empty
@@ -75,6 +97,7 @@ if __name__ == '__main__':
         laser_alive = 0
         for lasers in laserList:
             for positions in lasers:
+                # Remove targets being hit by lasers in the target_remain
                 try:
                     if (positions[0] in target_remain):
                         target_remain.remove(positions[0])
@@ -85,6 +108,7 @@ if __name__ == '__main__':
             if not (len(lasers[-1]) == 0):
                 laser_alive += 1
 
+        # solution is correct if all targets get hit by lasers
         if (len(target_remain) == 0):
             success = True
             print('Solution found!')
