@@ -73,9 +73,12 @@ def lazor_board_reader(filename):
     
     # Generate the array version of the grid and write in 
     # specifications from the .bff file
-    grid_x_length = 2 * len(file_grid) + 1
-    grid_y_length = 2 * len(file_grid[0]) + 1
-    grid = [['x' for x in range(grid_x_length)] for y in range(grid_y_length)]
+    if len(file_grid) == 0:
+        grid =[]
+    else:
+        grid_x_length = 2 * len(file_grid) + 1
+        grid_y_length = 2 * len(file_grid[0]) + 1
+        grid = [['x' for x in range(grid_x_length)] for y in range(grid_y_length)]
 
     for i in range(0, len(file_grid)):
         for j in range(0,len(file_grid[0])):
@@ -100,11 +103,28 @@ def lazor_board_reader(filename):
             lazers.append([(int(important_text[l][1]), int(important_text[l][2])), (int(important_text[l][3]),int(important_text[l][4]))])
         elif important_text[l][0] == 'P':
             intersects.append((int(important_text[l][1]), int(important_text[l][2])))
-
+    if len(grid) == 0:
+        print '''ERROR: File contains no board in an appropriate format. Board must be in format:
+            GRID START
+            row
+            row
+            ...
+            GRID STOP'''
+    elif blocks_a_b_c == [0, 0, 0]:
+        print '''ERROR: File contains no blocks to place. Blocks must be written in as some combination of:
+            A #
+            B #
+            C #'''
+    elif len(lazers) == 0:
+        print '''ERROR: File contains no lasers to run board. Lasers must be written in the form:
+            L # # # #'''
+    elif len(intersects) == 0:
+        print '''ERROR: File contains no intersection points for required win condition. Points must be written in the form:
+            P # #'''
     return grid, blocks_a_b_c, lazers, intersects
 
 
 if __name__ == '__main__':
-    a = lazor_board_reader('mad_1_solution_board.bff')
+    a = lazor_board_reader('mad_1.bff')
     grid = a[0]
     
