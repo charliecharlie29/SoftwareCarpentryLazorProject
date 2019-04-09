@@ -5,10 +5,13 @@ import copy
 
 """
 Doc String to be written
+
 Notes:
     1. Changed all lazor to laser, otherwise very confusing
     2. Moved the chk_pos function ouside
     3. Read how the laser runner and the main code works before start changing
+    4. Current Problem is that the laser runner function never returns True
+
 """
 def laser_board_reader(filename):
     '''
@@ -30,6 +33,7 @@ def laser_board_reader(filename):
     and builds an array out of that information to represent a list, then compiles a list of blocks, a list of lazers, and a list of required intersection points
 
     **Parameters**
+
         filename: *str*
             The .bff file that contains all the laser information
 
@@ -281,8 +285,7 @@ def laser_runner(board,laser_origin,targetPos):
     # solve for the laser path
     success = False
 
-    # Keep iterating the laser until success or all lasers out of boundary or
-    # absorbed
+    # Keep iterating the laser until success or all lasers out of boundary or absorbed
     while not success:
         # A list that holds targets not hit by lasers yet
         target_remain = targetPos[:]
@@ -322,7 +325,6 @@ def laser_runner(board,laser_origin,targetPos):
             else:
                 laserList[i].append([])
 
-
         # Go throught the current laserList and see whehther all target points are in the laserList
 
         laser_alive = 0
@@ -330,6 +332,7 @@ def laser_runner(board,laser_origin,targetPos):
             for positions in lasers:
                 # Remove targets being hit by lasers in the target_remain
                 try:
+                    # print(positions[0],target_remain)
                     if (positions[0] in target_remain):
                         target_remain.remove(positions[0])
                 except IndexError:
@@ -338,6 +341,7 @@ def laser_runner(board,laser_origin,targetPos):
             # whether all lasers have reached boundaries
             if not (len(lasers[-1]) == 0):
                 laser_alive += 1
+        # print(len(target_remain))
 
         # solution is correct if all targets get hit by lasers
         if (len(target_remain) == 0):
@@ -379,10 +383,12 @@ if __name__ == "__main__":
 
     # 3. Get all permutations of block locations
     permutations = list(multiset_permutations(blockspots))
-    # print(permutations)
+    print(len(permutations))
     length = len(grid); width = len(grid[0])
 
     # Algorithm for solving: Create a list of all possible combinations of the lists containging possible block positions and run them individually until finding a solution
+
+    # runs = 0
 
     for possibility in permutations:
         # Create a working grid that reads the information of the block location inside each possibility in the permutation by looping through the array replacing 'o's with the blocks
@@ -392,10 +398,18 @@ if __name__ == "__main__":
                 for w in range(width):
                         if workinggrid[l][w] == 'o':
                                 workinggrid[l][w] = possibility.pop(0)
-        # print(laser_runner(workinggrid,laser_origin,targetPos))
+
+        if workinggrid[5][1] == 'C' and workinggrid[7][3] == 'A' and workinggrid[1][5] == 'A':
+            print("running the answer")
+            print(workinggrid)
+            print(laser_runner(workinggrid,laser_origin,targetPos))
+
         if laser_runner(workinggrid,laser_origin,targetPos) == True:
-            # Print the correct permutation when all targets are hit
-              break
+            print("We Did It")
+            break
+    #     else:
+    #         runs += 1
+    # print runs
 
 
 
