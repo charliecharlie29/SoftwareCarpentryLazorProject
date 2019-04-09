@@ -214,7 +214,7 @@ class Block:
 
         return new_dir
 
-def update_laser(board, pos, dir):
+def update_laser(board, pos, dirc):
     '''
     If the laser is not currently at the boundary, this function will check whether laser interacts with a block and return the new direction of laser
 
@@ -239,18 +239,20 @@ def update_laser(board, pos, dir):
 
     # check top and bottom of laser position if x is an odd number
     if (x % 2 == 1):
-        if not (board[x][y + dir[1]] == 'o') or (board[x][y + dir[1]] == 'x'):
-            block = Block((x, y + dir[1]), board[x][y + dir[1]])
-            new_dir = block.laser(pos, dir)
+        if not (board[x][y + dirc[1]] == 'o') or (board[x][y + dirc[1]] == 'x'):
+            block = Block((x, y + dirc[1]), board[x][y + dirc[1]])
+            new_dir = block.laser(pos, dirc)
         else:
-            new_dir = [dir]
+            new_dir = [dirc]
     # check left and right of laser position if x is an odd number
     else:
-        if not (board[x + dir[0]][y] == 'o') or (board[x + dir[0]][y] == 'x'):
-            block = Block((x + dir[0], y), board[x + dir[0]][y])
-            new_dir = block.laser(pos, dir)
+        if not (board[x + dirc[0]][y] == 'o') or (board[x + dirc[0]][y] == 'x'):
+            block = Block((x + dirc[0], y), board[x + dirc[0]][y])
+            new_dir = block.laser(pos, dirc)
         else:
-            new_dir = [dir]
+            new_dir = [dirc]
+
+    # print(new_dir,x,y)
 
     return new_dir
 
@@ -278,23 +280,30 @@ def pos_chk(board, pos):
         return True
 
 def laser_runner(board,laser_origin,targetPos):
+    # print("running")
+    board_is_right = False
+    if board[5][1] == 'C' and board[7][3] == 'A' and board[1][5] == 'A':
+        board_is_right = True
 
     # Initialize the list that stores all laser positions
-    laserList = [laser_origin]
+    laserList = copy.deepcopy([laser_origin])
 
     # solve for the laser path
     success = False
-
+    # target_remain = copy.deepcopy(targetPos)
     # Keep iterating the laser until success or all lasers out of boundary or absorbed
-    while not success:
+
+    # print("Before_While")
+    while True:
         # A list that holds targets not hit by lasers yet
-        target_remain = targetPos[:]
+        target_remain = copy.deepcopy(targetPos)
         for i in range (len(laserList)):
             # Get current position of this laser if the last position in this
             # laser list is not empty
+            # print(laserList)
             if (len(laserList[i][-1]) == 0):
                 continue
-            pos, dir = laserList[i][-1][0], laserList[i][-1][1]
+            pos, dirc = laserList[i][-1][0], laserList[i][-1][1]
 
             # Check whether the laser is at the boundary of the board
             # If so, append a empty list to this list in laserList and skip to
@@ -304,13 +313,14 @@ def laser_runner(board,laser_origin,targetPos):
                 continue
 
             # move laser one step forward
-            next_dir = update_laser(board, pos, dir)
+            # print(pos)
+            next_dir = update_laser(board, pos, dirc)
 
             # If laser did not interact with a refract block
             if len(next_dir) == 1:
-                dir = next_dir[0]
-                pos = tuple(map(sum, zip(pos, dir)))
-                laserList[i].append([pos, dir])
+                dirc = next_dir[0]
+                pos = tuple(map(sum, zip(pos, dirc)))
+                laserList[i].append([pos, dirc])
             # If laser interacted with a refract block and created a new laser
             elif len(next_dir) == 2:
                 dir1, dir2 = next_dir[0], next_dir[1]
@@ -341,14 +351,20 @@ def laser_runner(board,laser_origin,targetPos):
             # whether all lasers have reached boundaries
             if not (len(lasers[-1]) == 0):
                 laser_alive += 1
-        # print(len(target_remain))
+
+        # if board[5][1] == 'C' and board[7][3] == 'A' and board[1][5] == 'A':
+        #     print(board)
+        #     print(laserList)
+        #     print(target_remain)
 
         # solution is correct if all targets get hit by lasers
         if (len(target_remain) == 0):
+            print("Solution Found")
             return True
 
         # break the while loop if failed
         if (laser_alive == 0):
+            # print("Nope")
             return False
 
 
@@ -383,12 +399,12 @@ if __name__ == "__main__":
 
     # 3. Get all permutations of block locations
     permutations = list(multiset_permutations(blockspots))
-    print(len(permutations))
     length = len(grid); width = len(grid[0])
-
+    print(len(permutations))
     # Algorithm for solving: Create a list of all possible combinations of the lists containging possible block positions and run them individually until finding a solution
 
     # runs = 0
+    num_of_loop = 0
 
     for possibility in permutations:
         # Create a working grid that reads the information of the block location inside each possibility in the permutation by looping through the array replacing 'o's with the blocks
@@ -398,15 +414,18 @@ if __name__ == "__main__":
                 for w in range(width):
                         if workinggrid[l][w] == 'o':
                                 workinggrid[l][w] = possibility.pop(0)
+        num_of_loop += 1
+        # if workinggrid[5][1] == 'C' and workinggrid[7][3] == 'A' and workinggrid[1][5] == 'A':
+        #     print("running the answer")
+        #     print(workinggrid)
+        #     print(laser_runner(workinggrid,laser_origin,targetPos))
+        # print num_of_loop
+        if laser_runner(workinggrid,laser_origin,targetPos) == False:
+            continue
 
-        if workinggrid[5][1] == 'C' and workinggrid[7][3] == 'A' and workinggrid[1][5] == 'A':
-            print("running the answer")
-            print(workinggrid)
-            print(laser_runner(workinggrid,laser_origin,targetPos))
-
-        if laser_runner(workinggrid,laser_origin,targetPos) == True:
-            print("We Did It")
-            break
+        # if laser_runner(workinggrid,laser_origin,targetPos) == True:
+        #     print("We Did It")
+        #     break
     #     else:
     #         runs += 1
     # print runs
