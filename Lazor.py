@@ -1,5 +1,31 @@
 '''
-Need to write this initial docstring
+Authors: Charlie Chen, Josh Cole, Katherine Miller, Yi Li
+Project: Lazor app game solver
+Due date: 11:59pm Apr 17th, 2019
+
+Contains all code necessary for solving a Lazor puzzle containing reflect, opaque,
+and reflect blocks. 
+
+**Functions**
+    laser_board_reader
+        reads .bff file
+    pos_chk
+        checks if a position is inside the board
+    update_laser
+        moves the laser one step forward
+    laser_runner
+        moves the laser through a whole board
+    get_colors
+        defines the colors for the output .png
+    save_grid
+        saves a .png of the solution if a solution is found
+    *lazors_cheat*
+        Goes through all possible solutions for a board until a correct one is found
+        *The only function that needs to be called to solve a Lazor puzzle
+        All other functions/classes are called by this function.*
+
+**Classes**
+    Block
 '''
 from PIL import Image
 from itertools import *
@@ -7,16 +33,6 @@ from sympy.utilities.iterables import multiset_permutations
 import copy
 import os
 import time
-
-"""
-Doc String to be written
-
-Notes:
-    2. Moved the chk_pos function ouside
-    3. Read how the laser runner and the main code works before start changing
-"""
-
-
 
 def laser_board_reader(filename):
 
@@ -68,7 +84,12 @@ def laser_board_reader(filename):
     '''
     print("Loading in board...")
     # Read in the file and then parse it:
-    raw_file = open(filename, 'r').read()
+    try: 
+        raw_file = open(filename, 'r').read()
+    except IOError:
+        print("ERROR: No such file exists. Check spelling.")
+        exit()
+
     list_by_line = raw_file.strip().split('\n')
 
     # Cut out all the comments so you read through less text
@@ -132,8 +153,7 @@ def laser_board_reader(filename):
             intersects.append((int(important_text[l][1]), int(important_text[l][2])))
 
     # Generates error messages if something isn't contained in the file correctly,
-    # and instructs on what proper format should look like. Returns things no matter
-    # what though so downstream functions can still work
+    # and instructs on what proper format should look like.
     if len(grid) == 0:
         print('''ERROR: File contains no board in an appropriate format. Board must be in format:
             GRID START
@@ -141,17 +161,21 @@ def laser_board_reader(filename):
             row
             ...
             GRID STOP''')
+        exit()
     elif blocks_a_b_c == [0, 0, 0]:
         print('''ERROR: File contains no blocks to place. Blocks must be written in as some combination of:
             A #
             B #
             C #''')
+        exit()
     elif len(lasers) == 0:
         print('''ERROR: File contains no lasers to run board. Lasers must be written in the form:
             L # # # #''')
+        exit()
     elif len(intersects) == 0:
         print('''ERROR: File contains no intersection points for required win condition. Points must be written in the form:
             P # #''')
+        exit()
     else:
         print("Board loaded.")
     return grid, blocks_a_b_c, lasers, intersects
@@ -225,7 +249,7 @@ def save_grid(grid, name="grid"):
 
 
     # Verify that all values in the grid are valid colors.
-    ERR_MSG = "Error, invalid grid value found!"
+    ERR_MSG = "ERROR: invalid grid value found!"
     assert all([x in colors.keys() for row in grid for x in row]), ERR_MSG
     img = Image.new("RGB", (dimx, dimy), color=0)
 
@@ -263,7 +287,7 @@ def save_grid(grid, name="grid"):
     if not name.endswith(".png"):
         name += "_solution.png"
     img.save("%s" % name)
-    print("Solution saved in current folder as ")
+    print("Solution saved in current folder as %s" % name)
 
 class Block:
     '''
@@ -294,7 +318,7 @@ class Block:
 
         #Print error message and quit if invalid type given
         if not (type.lower() in ['o', 'x', 'a', 'b', 'c']):
-            print('Incorrect type input for block!')
+            print('ERROR: Incorrect type input for block! Must be o, x, A, B, or C')
             exit()
 
     def laser(self, pos, dir):
@@ -594,7 +618,9 @@ def lazors_cheat(filename):
     # Algorithm for solving: Create a list of all possible combinations of the
     # lists containging possible block positions and run them individually until 
     # finding a solution
-
+    print("%i possible solutions." % len(permutations))
+    print("Solving...")
+    SOLUTION_FOUND = False
     for possibility in permutations:
 
         # Create a working grid that reads the information of the block location 
@@ -607,15 +633,19 @@ def lazors_cheat(filename):
                     workinggrid[l][w] = possibility.pop(0)
 
         if laser_runner(workinggrid,laser_origin,targetPos) == True:
-            print("We Did It")
+            print("Solution found!")
             save_grid(workinggrid, name="%s_solution.png" % filename)
+            SOLUTION_FOUND = True
             break
+    if SOLUTION_FOUND == False:
+        print('''Solution not found.
+        Please double check .bff file is correct''')
 
 
 
 if __name__ == "__main__":
 
     time_start = time.time()
-    lazors_cheat("tiny_5.bff")
+    lazors_cheat("showstopper_4.bff")
     time_end = time.time()
     print('run time: %f seconds' %(time_end - time_start))
