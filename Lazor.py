@@ -1,5 +1,5 @@
 '''
-Authors: Charlie Chen, Josh Cole, Katherine Miller, Yi Li
+Authors: Kuan-Lin Chen, Josh Cole, Katherine Miller, Yi Li
 Project: Lazor app game solver
 Due date: 11:59pm Apr 17th, 2019
 
