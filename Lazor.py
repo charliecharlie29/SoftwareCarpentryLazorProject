@@ -4,7 +4,7 @@ Project: Lazor app game solver
 Due date: 11:59pm Apr 17th, 2019
 
 Contains all code necessary for solving a Lazor puzzle containing reflect, opaque,
-and reflect blocks. 
+and reflect blocks.
 
 **Functions**
     laser_board_reader
@@ -55,7 +55,7 @@ def laser_board_reader(filename):
                 B = fixed opaque block
                 C = fixed refract block
 
-    After reading in builds an array out of that information to represent a list, 
+    After reading in builds an array out of that information to represent a list,
     then compiles a list of blocks, a list of lasers, and a list of required
     intersection points
 
@@ -84,7 +84,7 @@ def laser_board_reader(filename):
     '''
     print("Loading in board...")
     # Read in the file and then parse it:
-    try: 
+    try:
         raw_file = open(filename, 'r').read()
     except IOError:
         print("ERROR: No such file exists. Check spelling.")
@@ -214,7 +214,7 @@ def get_colors():
 def save_grid(grid, name="grid"):
     '''
     This will save a grid object to a file as a legible board with blocks as larger
-    spaces and the boundaries as thin lines. This function was modified from the 
+    spaces and the boundaries as thin lines. This function was modified from the
     save_maze function that was provided in the Software Carpentry maze lab.
 
     **Parameters**
@@ -303,13 +303,13 @@ class Block:
         This function initilizes the block object
 
         **Parameters**
-    
+
             x: *int*
                 The x-coordinate of the block on board
-    
+
             y: *int*
                 The y-coordinate of the block on board
-    
+
             type: *string*
                 The type of the block
         '''
@@ -404,11 +404,11 @@ def update_laser(board, pos, dirc):
         if (board[x][y + dirc[1]].lower() == 'a') or \
         (board[x][y + dirc[1]].lower() == 'b') or \
         (board[x][y + dirc[1]].lower() == 'c'):
-
             block = Block((x, y + dirc[1]), board[x][y + dirc[1]])
             new_dir = block.laser(pos, dirc)
         else:
-            new_dir = [dirc]
+            new_dir = copy.deepcopy([dirc])
+
 
     # Check left and right of laser position if x is an evem number
     else:
@@ -419,7 +419,7 @@ def update_laser(board, pos, dirc):
             block = Block((x + dirc[0], y), board[x + dirc[0]][y])
             new_dir = block.laser(pos, dirc)
         else:
-            new_dir = [dirc]
+            new_dir = copy.deepcopy([dirc])
 
     return new_dir
 
@@ -445,7 +445,7 @@ def pos_chk(board, pos):
 
     len_x, len_y = len(board), len(board[0])
 
-    if (pos[0] == 0 or pos[0] == len_x - 1 or pos[1] == 0 or pos[1] == len_y - 1):
+    if (pos[0] <= 0 or pos[0] >= len_x - 1 or pos[1] <= 0 or pos[1] >= len_y - 1):
         return False
     else:
         return True
@@ -503,7 +503,7 @@ def laser_runner(board, laser_origin, targetPos):
             # Check whether the laser is at the boundary of the board.
             # If so, append an empty list to this list in laserList and skip to
             # the next laser
-            if not pos_chk(board, pos):
+            if (pos_chk(board, pos) == False) and (ITER > 1):
                 laserList[i].append([])
                 continue
 
@@ -530,7 +530,7 @@ def laser_runner(board, laser_origin, targetPos):
             else:
                 laserList[i].append([])
 
-        # Go throught the current laserList and see whehther all target 
+        # Go throught the current laserList and see whehther all target
         # points are in the laserList
         laser_alive = 0
 
@@ -564,8 +564,8 @@ def laser_runner(board, laser_origin, targetPos):
 
 def lazors_cheat(filename):
     """
-    Takes a .bff file for a Lazor puzzle (containing only block types reflect, 
-    opaque, and refract) and solves it. Then creates a .png solution that shows 
+    Takes a .bff file for a Lazor puzzle (containing only block types reflect,
+    opaque, and refract) and solves it. Then creates a .png solution that shows
     where to put each block
 
     **Parameters**
@@ -616,14 +616,14 @@ def lazors_cheat(filename):
 
 
     # Algorithm for solving: Create a list of all possible combinations of the
-    # lists containging possible block positions and run them individually until 
+    # lists containging possible block positions and run them individually until
     # finding a solution
     print("%i possible solutions." % len(permutations))
     print("Solving...")
     SOLUTION_FOUND = False
     for possibility in permutations:
 
-        # Create a working grid that reads the information of the block location 
+        # Create a working grid that reads the information of the block location
         # inside each possibility of the permutations by looping through the array
         # replacing 'o's with the blocks
         workinggrid = copy.deepcopy(grid)
@@ -646,6 +646,6 @@ def lazors_cheat(filename):
 if __name__ == "__main__":
 
     time_start = time.time()
-    lazors_cheat("showstopper_4.bff")
+    lazors_cheat("dark_1.bff")
     time_end = time.time()
     print('run time: %f seconds' %(time_end - time_start))
