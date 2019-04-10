@@ -1,49 +1,43 @@
 from Lazor_Solver import lazor_board_reader
 from Yi_block import Block
 from Yi_block import update_laser
+import copy
 
 '''
 This script takes a board with blocks assigned and calculates the pathway of
 lasers, and determine whether the solution is correct.
 '''
 
+def pos_chk(board, pos):
+    len_x, len_y = len(board), len(board[0])
+    if (pos[0] == 0 or pos[0] == len_x - 1 or pos[1] == 0 or pos[1] == len_y - 1):
+        return False
+    return True
+
 if __name__ == '__main__':
 
     # Obtain the input info from lazor_board_reader function
-    input = lazor_board_reader('mad_1.bff')
+    input = lazor_board_reader('mad_7.bff')
     board = input[0]
     blocks = input[1]
     laser_origin = input[2]
     # Initialize the list that stores all laser positions
-    laserList = [laser_origin]
+    laserList = []
+    #laserList = copy.deepcopy([laser_origin])
+
+    for pos in laser_origin:
+        laserList.append([pos])
+        print('origin %s' %laserList)
+
     targetPos = input[3]
 
     # Assume we have the solution of correct board placement
-    board[5][1] = 'C'
+    board[5][1] = 'A'
     board[7][3] = 'A'
     board[1][5] = 'A'
-
-    def pos_chk(board, pos):
-    '''
-    This function checks whether a given laser position is at the boundary of
-    the board.
-
-    **Parameters**
-        board: *list, list, string*
-            contains list of x coordinates, in which list is a list of y
-            coordinates containing a string representing the type of block on
-            the board
-        pos: *tuple*
-            the current (x,y) position of the laser
-
-    **Return**
-        *boolean*
-            True if not on boundary and False if on boundary
-    '''
-        len_x, len_y = len(board), len(board[0])
-        if (pos[0] == 0 or pos[0] == len_x - 1 or pos[1] == 0 or pos[1] == len_y - 1):
-            return False
-        return True
+    board[5][5] = 'A'
+    board[7][7] = 'A'
+    board[5][9] = 'A'
 
     # solve for the laser path
     success = False
