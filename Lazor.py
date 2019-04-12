@@ -4,7 +4,7 @@ Project: Lazor app game solver
 Due date: 11:59pm Apr 17th, 2019
 
 Contains all code necessary for solving a Lazor puzzle containing reflect, opaque,
-and reflect blocks.
+and refract blocks.
 
 **Functions**
     laser_board_reader
@@ -27,15 +27,17 @@ and reflect blocks.
 **Classes**
     Block
 '''
-from PIL import Image
-from itertools import *
-from sympy.utilities.iterables import multiset_permutations
+
 import copy
 import os
 import time
 
-def laser_board_reader(filename):
+from PIL import Image
+from itertools import *
+from sympy.utilities.iterables import multiset_permutations
 
+
+def laser_board_reader(filename):
     '''
     Reads in a file and that contains the following:
         comments started with #
@@ -142,15 +144,38 @@ def laser_board_reader(filename):
         if len(important_text[l]) == 0:
             continue
         elif important_text[l][0] == 'A':
-            blocks_a_b_c[0] = int(important_text[l][1])
+            try:
+                blocks_a_b_c[0] = int(important_text[l][1])
+            except:
+                continue
         elif important_text[l][0] == 'B':
-            blocks_a_b_c[1] = int(important_text[l][1])
+            try:
+                blocks_a_b_c[1] = int(important_text[l][1])
+            except:
+                continue
         elif important_text[l][0] == 'C':
-            blocks_a_b_c[2] = int(important_text[l][1])
+            try:
+                blocks_a_b_c[2] = int(important_text[l][1])
+            except:
+                continue
         elif important_text[l][0] == 'L':
-            lasers.append([(int(important_text[l][1]), int(important_text[l][2])), (int(important_text[l][3]),int(important_text[l][4]))])
+            try:
+                lasers.append([(int(important_text[l][1]), int(important_text[l][2])),
+                    (int(important_text[l][3]),int(important_text[l][4]))])
+            except IndexError:
+                print("ERROR: Laser format is incorrect. Lasers must be written in the form:\n"
+                    + "\tL # # # #\n" 
+                    + "where the first two numbers are x and y starting coordinates and" 
+                    + "the second two are the x and y slope directions")
+                exit()
         elif important_text[l][0] == 'P':
-            intersects.append((int(important_text[l][1]), int(important_text[l][2])))
+            try:
+                intersects.append((int(important_text[l][1]), int(important_text[l][2])))
+            except IndexError:
+                print("ERROR: Target point format is incorrect. Targets must be written in the form:\n"
+                    + "\tP # #\n" 
+                    + "where the numbers are the x and y coordinates respectively")
+                exit()
 
     # Generates error messages if something isn't contained in the file correctly,
     # and instructs on what proper format should look like.
@@ -173,7 +198,7 @@ def laser_board_reader(filename):
             L # # # #''')
         exit()
     elif len(intersects) == 0:
-        print('''ERROR: File contains no intersection points for required win condition. Points must be written in the form:
+        print('''ERROR: File contains no target points for required win condition. Points must be written in the form:
             P # #''')
         exit()
     else:
@@ -209,7 +234,9 @@ def get_colors():
         'A': (255, 255, 255),
         'o': (50, 50, 50),
         'B': (0, 0, 0),
-        'C': (192, 192, 192),}
+        'C': (192, 192, 192),
+        }
+
 
 def save_grid(grid, name="grid"):
     '''
@@ -289,6 +316,7 @@ def save_grid(grid, name="grid"):
     img.save("%s" % name)
     print("Solution saved in current folder as %s" % name)
 
+
 class Block:
     '''
     This is an object that defines a block in the grid
@@ -298,6 +326,7 @@ class Block:
         'B'--opaque
         'C'--refract
     '''
+
     def __init__(self, block_coordinates, type):
         '''
         This function initilizes the block object
@@ -318,7 +347,7 @@ class Block:
 
         #Print error message and quit if invalid type given
         if not (type.lower() in ['o', 'x', 'a', 'b', 'c']):
-            print('ERROR: Incorrect type input for block! Must be o, x, A, B, or C')
+            print("ERROR: Incorrect type input for block! Must be o, x, A, B, or C")
             exit()
 
     def laser(self, pos, dir):
@@ -423,6 +452,7 @@ def update_laser(board, pos, dirc):
 
     return new_dir
 
+
 def pos_chk(board, pos):
     """
     This function checks whether a given laser position is at the boundary of
@@ -449,6 +479,7 @@ def pos_chk(board, pos):
         return False
     else:
         return True
+
 
 def laser_runner(board, laser_origin, targetPos):
     '''
@@ -562,6 +593,7 @@ def laser_runner(board, laser_origin, targetPos):
     else:
         return False
 
+
 def lazors_cheat(filename):
     """
     Takes a .bff file for a Lazor puzzle (containing only block types reflect,
@@ -576,9 +608,6 @@ def lazors_cheat(filename):
     **Returns**
         None
     """
-
-    # filename = raw_input("What is the filename?\n")
-
 
     # Checks for if the file name contains '.bff'' or not
     if ".bff" in filename:
@@ -637,15 +666,22 @@ def lazors_cheat(filename):
             save_grid(workinggrid, name="%s_solution.png" % filename)
             SOLUTION_FOUND = True
             break
-    if SOLUTION_FOUND == False:
-        print('''Solution not found.
-        Please double check .bff file is correct''')
 
+    if SOLUTION_FOUND == False:
+        print('''Solution not found. Please double check .bff file is correct''')
 
 
 if __name__ == "__main__":
 
     time_start = time.time()
     lazors_cheat("dark_1.bff")
+    # lazors_cheat("mad_1.bff")
+    # lazors_cheat("mad_4.bff")
+    # lazors_cheat("mad_6.bff")
+    # lazors_cheat("mad_7.bff")
+    # lazors_cheat("numbered_6.bff")
+    # lazors_cheat("showstopper_4.bff")
+    # lazors_cheat("tiny_5.bff")
+    # lazors_cheat("yarn_5.bff")
     time_end = time.time()
     print('run time: %f seconds' %(time_end - time_start))
