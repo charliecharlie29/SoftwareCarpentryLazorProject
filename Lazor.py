@@ -97,7 +97,7 @@ def laser_board_reader(filename):
     # Cut out all the comments so you read through less text
     important_text = list()
     for l in list_by_line:
-        if not "#" in l:
+        if "#" not in l:
             important_text.append(l)
 
     # Select out the section of the file that represents what
@@ -121,7 +121,7 @@ def laser_board_reader(filename):
     # Error check for if there is not a correctly writen grid in the .bff file,
     # and then if there is, create a generic grid of the correct size
     if len(file_grid) == 0:
-        grid =[]
+        grid = []
     else:
         grid_x_length = 2 * len(file_grid) + 1
         grid_y_length = 2 * len(file_grid[0]) + 1
@@ -130,7 +130,7 @@ def laser_board_reader(filename):
     # Fill in to the generic grid, the specifications from the .bff file on locked
     # block locations, open spaces, and no block allowed spaces
     for i in range(0, len(file_grid)):
-        for j in range(0,len(file_grid[0])):
+        for j in range(0, len(file_grid[0])):
             grid[2 * j + 1][2 * i + 1] = file_grid[i][j]
 
     # Read out and turn into lists the number of blocks of each type, the lasers
@@ -161,20 +161,20 @@ def laser_board_reader(filename):
         elif important_text[l][0] == 'L':
             try:
                 lasers.append([(int(important_text[l][1]), int(important_text[l][2])),
-                    (int(important_text[l][3]),int(important_text[l][4]))])
+                        (int(important_text[l][3]), int(important_text[l][4]))])
             except IndexError:
                 print("ERROR: Laser format is incorrect. Lasers must be written in the form:\n"
-                    + "\tL # # # #\n" 
-                    + "where the first two numbers are x and y starting coordinates and" 
-                    + "the second two are the x and y slope directions")
+                        + "\tL # # # #\n"
+                        + "where the first two numbers are x and y starting coordinates and"
+                        + "the second two are the x and y slope directions")
                 exit()
         elif important_text[l][0] == 'P':
             try:
                 intersects.append((int(important_text[l][1]), int(important_text[l][2])))
             except IndexError:
                 print("ERROR: Target point format is incorrect. Targets must be written in the form:\n"
-                    + "\tP # #\n" 
-                    + "where the numbers are the x and y coordinates respectively")
+                        + "\tP # #\n"
+                        + "where the numbers are the x and y coordinates respectively")
                 exit()
 
     # Generates error messages if something isn't contained in the file correctly,
@@ -273,8 +273,6 @@ def save_grid(grid, name="grid"):
     dimy = ((nBlocksy - 1) // 2 * (blockSize1 + blockSize2)) + blockSize1
     colors = get_colors()
 
-
-
     # Verify that all values in the grid are valid colors.
     ERR_MSG = "ERROR: invalid grid value found!"
     assert all([x in colors.keys() for row in grid for x in row]), ERR_MSG
@@ -345,7 +343,7 @@ class Block:
         self.coordinates = block_coordinates
         self.type = type.lower()
 
-        #Print error message and quit if invalid type given
+        # Print error message and quit if invalid type given
         if not (type.lower() in ['o', 'x', 'a', 'b', 'c']):
             print("ERROR: Incorrect type input for block! Must be o, x, A, B, or C")
             exit()
@@ -431,8 +429,8 @@ def update_laser(board, pos, dirc):
     # Check above and below laser position if x is an odd number
     if (x % 2 == 1):
         if (board[x][y + dirc[1]].lower() == 'a') or \
-        (board[x][y + dirc[1]].lower() == 'b') or \
-        (board[x][y + dirc[1]].lower() == 'c'):
+                (board[x][y + dirc[1]].lower() == 'b') or \
+                (board[x][y + dirc[1]].lower() == 'c'):
             block = Block((x, y + dirc[1]), board[x][y + dirc[1]])
             new_dir = block.laser(pos, dirc)
         else:
@@ -442,8 +440,8 @@ def update_laser(board, pos, dirc):
     # Check left and right of laser position if x is an evem number
     else:
         if (board[x + dirc[0]][y].lower() == 'a') or \
-        (board[x + dirc[0]][y].lower() == 'b') or \
-        (board[x + dirc[0]][y].lower() == 'c'):
+                (board[x + dirc[0]][y].lower() == 'b') or \
+                (board[x + dirc[0]][y].lower() == 'c'):
 
             block = Block((x + dirc[0], y), board[x + dirc[0]][y])
             new_dir = block.laser(pos, dirc)
@@ -523,7 +521,7 @@ def laser_runner(board, laser_origin, targetPos):
     # Keep iterating the laser until success or all lasers out of boundary or absorbed
     while not success:
         ITER += 1
-        for i in range (len(laserList)):
+        for i in range(len(laserList)):
 
             # Get current position of this laser if the last position in this
             # laser list is not empty. If it is empty, just continue
@@ -534,7 +532,7 @@ def laser_runner(board, laser_origin, targetPos):
             # Check whether the laser is at the boundary of the board.
             # If so, append an empty list to this list in laserList and skip to
             # the next laser
-            if (pos_chk(board, pos) == False) and (ITER > 1):
+            if (not pos_chk(board, pos)) and (ITER > 1):
                 laserList[i].append([])
                 continue
 
@@ -620,7 +618,6 @@ def lazors_cheat(filename):
     laser_origin = information[2]
     targetPos = information[3]
 
-
     # Seting up block locations
 
     # 1. Pull out block locations from grid
@@ -633,16 +630,16 @@ def lazors_cheat(filename):
     # 2. Assign types of block to list of grid locations
     for i in range(A):
         blockspots[i] = 'A'
-    for i in range(A,(A+B)):
+    for i in range(A, (A+B)):
         blockspots[i] = 'B'
-    for i in range((A+B),(A+B+C)):
+    for i in range((A+B), (A+B+C)):
         blockspots[i] = 'C'
 
     # 3. Get all permutations of block locations for a given grid and number of each
     # type of block
     permutations = list(multiset_permutations(blockspots))
-    length = len(grid); width = len(grid[0])
-
+    length = len(grid)
+    width = len(grid[0])
 
     # Algorithm for solving: Create a list of all possible combinations of the
     # lists containging possible block positions and run them individually until
@@ -661,13 +658,13 @@ def lazors_cheat(filename):
                 if workinggrid[l][w] == 'o':
                     workinggrid[l][w] = possibility.pop(0)
 
-        if laser_runner(workinggrid,laser_origin,targetPos) == True:
+        if laser_runner(workinggrid, laser_origin, targetPos):
             print("Solution found!")
             save_grid(workinggrid, name="%s_solution.png" % filename)
             SOLUTION_FOUND = True
             break
 
-    if SOLUTION_FOUND == False:
+    if not SOLUTION_FOUND:
         print('''Solution not found. Please double check .bff file is correct''')
 
 
